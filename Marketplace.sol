@@ -9,7 +9,7 @@ interface IProvenance {
     function transferOwnership(uint256 productId, address newOwner) external;
 }
 
-contract Marketplace {
+contract MarketplaceContract {
     IEntityContract public entityContract;
     IProvenance public provenanceContract;
     address public admin;
@@ -31,6 +31,7 @@ contract Marketplace {
         string description;
         address seller;
         bool sold;
+        bool isStolen;
         Sale[] history;
     }
 
@@ -39,6 +40,7 @@ contract Marketplace {
 
     event ItemListed(uint256 indexed listingId, uint256 productId, address indexed seller);
     event ItemSold(uint256 indexed listingId, address indexed buyer, uint256 timestamp);
+    event ItemMarkedStolen(uint256 indexed listingId, address indexed reporter);
 
     modifier onlyVerifiedManufacturer() {
         require(entityContract.isVerified(msg.sender), "Not a verified manufacturer");
@@ -50,21 +52,25 @@ contract Marketplace {
         _;
     }
 
+    modifier notStolen(uint256 listingId) {
+        require(!listings[listingId].isStolen, "Item is reported stolen");
+        _;
+    }
+
     function listItem(uint256 productId, string memory title, string memory description) external onlyVerifiedManufacturer {
-        listings[nextListingId] = Listing({
-            productId: productId,
-            title: title,
-            description: description,
-            seller: msg.sender,
-            sold: false,
-            history: new Sale[](0)
-        });
+        Listing storage newListing = listings[nextListingId];
+        newListing.productId = productId;
+        newListing.title = title;
+        newListing.description = description;
+        newListing.seller = msg.sender;
+        newListing.sold = false;
+        newListing.isStolen = false;
 
         emit ItemListed(nextListingId, productId, msg.sender);
         nextListingId++;
     }
 
-    function buyItem(uint256 listingId) external {
+    function buyItem(uint256 listingId) external notStolen(listingId) {
         Listing storage item = listings[listingId];
         require(!item.sold, "Item already sold");
         require(msg.sender != item.seller, "Seller cannot buy their own item");
@@ -81,11 +87,24 @@ contract Marketplace {
         emit ItemSold(listingId, msg.sender, block.timestamp);
     }
 
+    function markAsStolen(uint256 listingId) external {
+        Listing storage item = listings[listingId];
+        require(msg.sender == item.seller, "Only the seller can mark stolen");
+        require(!item.isStolen, "Already marked as stolen");
+
+        item.isStolen = true;
+        emit ItemMarkedStolen(listingId, msg.sender);
+    }
+
     function getSaleHistory(uint256 listingId) external view returns (Sale[] memory) {
         return listings[listingId].history;
     }
 
     function getListing(uint256 listingId) external view returns (Listing memory) {
         return listings[listingId];
+    }
+
+    function isItemStolen(uint256 listingId) external view returns (bool) {
+        return listings[listingId].isStolen;
     }
 }
