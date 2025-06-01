@@ -1,0 +1,148 @@
+[
+  {
+    "inputs": [{ "internalType": "address", "name": "_entityContract", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "componentId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "producer", "type": "address" },
+      { "indexed": false, "internalType": "string", "name": "location", "type": "string" }
+    ],
+    "name": "ComponentRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "componentId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "to", "type": "address" }
+    ],
+    "name": "ComponentTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "goodId", "type": "uint256" },
+      { "indexed": false, "internalType": "string", "name": "newLocation", "type": "string" }
+    ],
+    "name": "GoodMoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "goodId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "manufacturer", "type": "address" },
+      { "indexed": false, "internalType": "string", "name": "physicalId", "type": "string" }
+    ],
+    "name": "GoodRegistered",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "componentTransfers",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "components",
+    "outputs": [
+      { "internalType": "address", "name": "producer", "type": "address" },
+      { "internalType": "string", "name": "location", "type": "string" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+      { "internalType": "bool", "name": "exists", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "entityContract",
+    "outputs": [{ "internalType": "contract EntityContract", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_goodId", "type": "uint256" }],
+    "name": "goodExists",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "goods",
+    "outputs": [
+      { "internalType": "address", "name": "manufacturer", "type": "address" },
+      { "internalType": "string", "name": "physicalId", "type": "string" },
+      { "internalType": "string", "name": "location", "type": "string" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+      { "internalType": "string", "name": "currentLocation", "type": "string" },
+      { "internalType": "bool", "name": "exists", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextComponentId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextGoodId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "string", "name": "_location", "type": "string" }],
+    "name": "registerComponent",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_physicalId", "type": "string" },
+      { "internalType": "uint256[]", "name": "_componentIds", "type": "uint256[]" },
+      { "internalType": "string", "name": "_location", "type": "string" }
+    ],
+    "name": "registerGood",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_componentId", "type": "uint256" },
+      { "internalType": "address", "name": "_to", "type": "address" }
+    ],
+    "name": "transferComponent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_goodId", "type": "uint256" },
+      { "internalType": "string", "name": "_newLocation", "type": "string" }
+    ],
+    "name": "updateGoodLocation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
