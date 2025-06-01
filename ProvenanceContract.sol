@@ -185,4 +185,9 @@ contract ProvenanceContract {
     function goodExists(uint256 _goodId) external view returns (bool) {
         return goods[_goodId].exists;
     }
+
+    function getComponentsByOwner(address owner) public view returns (Component[] memory) {
+        return ownerToComponents[owner];
+    }
+
 }
