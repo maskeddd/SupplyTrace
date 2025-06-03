@@ -1,0 +1,63 @@
+import React, { useState } from "react";
+import Web3 from "web3";
+import provenanceABI from "../provenance.json";
+
+
+const CONTRACT_ADDRESS = "0x7A24f036A33de382c311c1448C73a8310371Cf6E";
+
+
+const TransferOwnership = () => {
+  const [productId, setProductId] = useState("");
+  const [newOwner, setNewOwner] = useState("");
+  const [status, setStatus] = useState("");
+
+  const handleTransfer = async () => {
+    if (!(window as any).ethereum) {
+      setStatus("MetaMask not detected.");
+      return;
+    }
+
+    try {
+      const web3 = new Web3((window as any).ethereum);
+      await (window as any).ethereum.request({ method: "eth_requestAccounts" });
+      const accounts = await web3.eth.getAccounts();
+      const contract = new web3.eth.Contract(provenanceABI as any, CONTRACT_ADDRESS);
+
+      await contract.methods.transferOwnership(productId, newOwner).send({ from: accounts[0] });
+      setStatus("Ownership transferred successfully!");
+    } catch (error: any) {
+      console.error(error);
+      setStatus("Error during ownership transfer.");
+    }
+  };
+
+  return (
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">Transfer Product Ownership</h2>
+      <div className="mb-2">
+        <label className="block mb-1">Product ID:</label>
+        <input
+          type="text"
+          className="border p-2 w-full"
+          value={productId}
+          onChange={(e) => setProductId(e.target.value)}
+        />
+      </div>
+      <div className="mb-2">
+        <label className="block mb-1">New Owner Address:</label>
+        <input
+          type="text"
+          className="border p-2 w-full"
+          value={newOwner}
+          onChange={(e) => setNewOwner(e.target.value)}
+        />
+      </div>
+      <button onClick={handleTransfer} className="bg-blue-500 text-white px-4 py-2 rounded">
+        Transfer Ownership
+      </button>
+      {status && <p className="mt-4 text-sm">{status}</p>}
+    </div>
+  );
+};
+
+export default TransferOwnership;
