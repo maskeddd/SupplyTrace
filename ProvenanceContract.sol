@@ -56,10 +56,10 @@ contract ProvenanceContract {
     mapping(string => OwnershipTransfer[]) private ownershipHistory;
     mapping(address => Product[]) private finishedProductsByOwner;
 
-    // 🆕 Mapping to store stolen status
+    // Mapping to store stolen status
     mapping(string => bool) private stolenStatus;
 
-    // 🆕 Event for stolen marking
+    // Event for stolen marking
     event ProductMarkedStolen(string productId, address markedBy);
 
     /**
@@ -166,13 +166,13 @@ contract ProvenanceContract {
         return finishedProductsByOwner[owner];
     }
 
-    // 🆕 Mark a product as stolen
+    // Mark a product as stolen
     function markAsStolen(string memory productId) public onlyRegisteredEntity {
         stolenStatus[productId] = true;
         emit ProductMarkedStolen(productId, msg.sender);
     }
 
-    // 🆕 Check if a product is marked as stolen
+    // Check if a product is marked as stolen
     function isProductStolen(string memory productId) public view returns (bool) {
         return stolenStatus[productId];
     }
