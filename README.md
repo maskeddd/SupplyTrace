@@ -1,7 +1,5 @@
 # SupplyTrace – Blockchain Provenance and Marketplace
 
-## Overview
-
 **SupplyTrace** is a blockchain-based system designed to enhance transparency and trust in goods trading. It records the origin, ownership, and lifecycle events of items like jewelry made from precious metals and woodworks. The system helps prevent counterfeiting, verifies authenticity, and maintains public traceability using smart contracts on Ethereum.
 
 ## Stakeholders and Roles
