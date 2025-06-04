@@ -2,18 +2,34 @@
 pragma solidity ^0.8.30;
 
 /**
+ * @title Interface for EntityContract
+ * @dev Allows ProvenanceContract to verify entity registration
+ */
+interface IEntityContract {
+    function isEntityRegistered(address _entity) external view returns (bool);
+}
+
+/**
  * @title ProvenanceContract
  * @dev Tracks product lifecycle and interactions between primary producers and manufacturers
  * @notice Handles component registration, transfers, good creation, and internal movement tracking
  */
 contract ProvenanceContract {
+    // Reference to the EntityContract for access control
+    IEntityContract public entityContract;
+
+    constructor(address _entityContractAddress) {
+        entityContract = IEntityContract(_entityContractAddress);
+    }
+
     /**
-     * @dev Represents a raw component produced by primary producers
-     * @param componentId Unique identifier for the component
-     * @param location Geographic location where component was produced
-     * @param timestamp When the component was registered
-     * @param owner Ethereum address of the owner
+     * @dev Modifier to restrict functions to registered entities only
      */
+    modifier onlyRegisteredEntity() {
+        require(entityContract.isEntityRegistered(msg.sender), "Access denied: Not a registered entity");
+        _;
+    }
+
     struct Component {
         string componentId;
         string location;
@@ -21,14 +37,6 @@ contract ProvenanceContract {
         address owner;
     }
 
-    /**
-     * @dev Represents a finished product manufactured from raw components
-     * @param productId Unique identifier for the product
-     * @param name Name of the product
-     * @param componentIds Array of component IDs used to create the product
-     * @param timestamp When the product was registered
-     * @param owner Ethereum address of the owner
-     */
     struct Product {
         string productId;
         string name;
@@ -37,12 +45,6 @@ contract ProvenanceContract {
         address owner;
     }
 
-    /**
-     * @dev Records an ownership transfer event for auditing
-     * @param from Previous owner's Ethereum address
-     * @param to New owner's Ethereum address
-     * @param timestamp When the transfer occurred
-     */
     struct OwnershipTransfer {
         address from;
         address to;
@@ -52,16 +54,20 @@ contract ProvenanceContract {
     mapping(address => Component[]) private componentsByOwner;
     mapping(address => Product[]) private productsByOwner;
     mapping(string => OwnershipTransfer[]) private ownershipHistory;
-
-    // New mapping for finished products
     mapping(address => Product[]) private finishedProductsByOwner;
+
+    // 🆕 Mapping to store stolen status
+    mapping(string => bool) private stolenStatus;
+
+    // 🆕 Event for stolen marking
+    event ProductMarkedStolen(string productId, address markedBy);
 
     /**
      * @notice Registers a new component under the sender's address
      * @param componentId Unique identifier of the component
      * @param location Where the component was produced
      */
-    function registerComponent(string memory componentId, string memory location) public {
+    function registerComponent(string memory componentId, string memory location) public onlyRegisteredEntity {
         componentsByOwner[msg.sender].push(Component(componentId, location, block.timestamp, msg.sender));
     }
 
@@ -84,7 +90,7 @@ contract ProvenanceContract {
         string memory productId,
         string memory name,
         string[] memory componentIds
-    ) public {
+    ) public onlyRegisteredEntity {
         productsByOwner[msg.sender].push(Product(productId, name, componentIds, block.timestamp, msg.sender));
     }
 
@@ -102,21 +108,18 @@ contract ProvenanceContract {
      * @param productId ID of the product being transferred
      * @param newOwner Ethereum address of the new owner
      */
-    function transferOwnership(string memory productId, address newOwner) public {
+    function transferOwnership(string memory productId, address newOwner) public onlyRegisteredEntity {
         bool found = false;
         Product[] storage products = productsByOwner[msg.sender];
         for (uint256 i = 0; i < products.length; i++) {
             if (keccak256(abi.encodePacked(products[i].productId)) == keccak256(abi.encodePacked(productId))) {
                 Product memory product = products[i];
 
-                // Remove product from sender
                 products[i] = products[products.length - 1];
                 products.pop();
 
-                // Assign to new owner
                 productsByOwner[newOwner].push(product);
 
-                // Record transfer history
                 ownershipHistory[productId].push(OwnershipTransfer({
                     from: msg.sender,
                     to: newOwner,
@@ -139,22 +142,20 @@ contract ProvenanceContract {
         return ownershipHistory[productId];
     }
 
-    // Register Finished Product
     /**
      * @notice Registers a finished product made from component IDs
      * @param productId Unique identifier of the finished product
      * @param componentIds Array of component IDs included in the finished product
      */
-    function registerFinishedProduct(string memory productId, string[] memory componentIds) public {
+    function registerFinishedProduct(string memory productId, string[] memory componentIds) public onlyRegisteredEntity {
         finishedProductsByOwner[msg.sender].push(Product({
             productId: productId,
-            name: "", // Optional: or set via additional parameter
+            name: "",
             componentIds: componentIds,
             timestamp: block.timestamp,
             owner: msg.sender
         }));
     }
-
 
     /**
      * @notice Returns all finished products owned by a specific address
@@ -163,5 +164,16 @@ contract ProvenanceContract {
      */
     function getFinishedProductsByOwner(address owner) public view returns (Product[] memory) {
         return finishedProductsByOwner[owner];
+    }
+
+    // 🆕 Mark a product as stolen
+    function markAsStolen(string memory productId) public onlyRegisteredEntity {
+        stolenStatus[productId] = true;
+        emit ProductMarkedStolen(productId, msg.sender);
+    }
+
+    // 🆕 Check if a product is marked as stolen
+    function isProductStolen(string memory productId) public view returns (bool) {
+        return stolenStatus[productId];
     }
 }
