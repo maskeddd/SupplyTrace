@@ -20,7 +20,7 @@ contract MarketplaceContract {
     mapping(string => Listing) public listings;
     mapping(string => Ownership) public ownership;
 
-    string[] public listedProductIds; // Dynamic product list
+    string[] public listedProductIds; // Track listed product IDs
 
     event ProductListed(string indexed productId, address indexed seller, uint256 price);
     event OwnershipTransferred(string indexed productId, address indexed from, address indexed to);
@@ -33,13 +33,19 @@ contract MarketplaceContract {
     function listProduct(string memory _productId, uint256 _price) external {
         require(_price > 0, "Price must be greater than 0");
 
+        // ✅ Check with ProvenanceContract if product is stolen
+        require(!provenanceContract.isProductStolen(_productId), "Cannot list a stolen product");
+
         // Auto-infer ownership from ProvenanceContract if not yet set
         if (ownership[_productId].owner == address(0)) {
             ProvenanceContract.Product[] memory products = provenanceContract.getProductsByOwner(msg.sender);
             bool found = false;
 
             for (uint256 i = 0; i < products.length; i++) {
-                if (keccak256(abi.encodePacked(products[i].productId)) == keccak256(abi.encodePacked(_productId))) {
+                if (
+                    keccak256(abi.encodePacked(products[i].productId)) ==
+                    keccak256(abi.encodePacked(_productId))
+                ) {
                     ownership[_productId].owner = msg.sender;
                     found = true;
                     break;
@@ -57,7 +63,7 @@ contract MarketplaceContract {
             isListed: true
         });
 
-        listedProductIds.push(_productId); // Add to listing array
+        listedProductIds.push(_productId); // Track this listing
 
         emit ProductListed(_productId, msg.sender, _price);
     }
@@ -74,6 +80,7 @@ contract MarketplaceContract {
         ownership[_productId].owner = msg.sender;
         listings[_productId].isListed = false;
 
+        // Pay the seller
         payable(seller).transfer(msg.value);
 
         emit OwnershipTransferred(_productId, seller, msg.sender);
@@ -98,7 +105,6 @@ contract MarketplaceContract {
         return (listing.seller, listing.price, listing.isListed);
     }
 
-    // Get all listed product IDs
     function getAllListedProductIds() external view returns (string[] memory) {
         return listedProductIds;
     }
