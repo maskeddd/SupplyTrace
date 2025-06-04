@@ -50,14 +50,6 @@
 - Public functions to view current owner and full sale logs
 - Stolen items cannot be resold
 
-## Files in This Project
-
-File Description
-
-`EntityContract.sol` | Registers verified producers and manufacturers
-`ProvenanceContract.sol` | Tracks component registration and good ownership
-`MarketplaceContract.sol` | Manages product listing, sales, and lifecycle
-
 ## Demo Video
 
 https://www.youtube.com/watch?v=n3_yoUKX9q8
