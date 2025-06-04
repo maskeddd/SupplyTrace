@@ -56,11 +56,12 @@ contract ProvenanceContract {
     mapping(string => OwnershipTransfer[]) private ownershipHistory;
     mapping(address => Product[]) private finishedProductsByOwner;
 
-    // Mapping to store stolen status
+    // 🆕 Mapping to store stolen status
     mapping(string => bool) private stolenStatus;
 
-    // Event for stolen marking
+    // 🆕 Events
     event ProductMarkedStolen(string productId, address markedBy);
+    event ProductUnmarkedStolen(string productId, address unmarkedBy);
 
     /**
      * @notice Registers a new component under the sender's address
@@ -166,13 +167,29 @@ contract ProvenanceContract {
         return finishedProductsByOwner[owner];
     }
 
-    // Mark a product as stolen
+    /**
+     * @notice Marks a product as stolen
+     * @param productId ID of the product to mark as stolen
+     */
     function markAsStolen(string memory productId) public onlyRegisteredEntity {
         stolenStatus[productId] = true;
         emit ProductMarkedStolen(productId, msg.sender);
     }
 
-    // Check if a product is marked as stolen
+    /**
+     * @notice Removes the stolen mark from a product
+     * @param productId ID of the product to unmark
+     */
+    function removeStolenMark(string memory productId) public onlyRegisteredEntity {
+        stolenStatus[productId] = false;
+        emit ProductUnmarkedStolen(productId, msg.sender);
+    }
+
+    /**
+     * @notice Checks if a product is marked as stolen
+     * @param productId Product ID to query
+     * @return Boolean indicating whether the product is stolen
+     */
     function isProductStolen(string memory productId) public view returns (bool) {
         return stolenStatus[productId];
     }
