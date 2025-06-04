@@ -1,18 +1,14 @@
 # SupplyTrace – Blockchain Provenance and Marketplace
 
-##Overview
+## Overview
 
 **SupplyTrace** is a blockchain-based system designed to enhance transparency and trust in goods trading. It records the origin, ownership, and lifecycle events of items like jewelry made from precious metals and woodworks. The system helps prevent counterfeiting, verifies authenticity, and maintains public traceability using smart contracts on Ethereum.
 
----
-
-##Stakeholders and Roles
+## Stakeholders and Roles
 
 - **Primary Producers** – Register raw materials (example: silver, leather)
 - **Manufacturers** – Create finished goods using raw components
 - **Consumers** – Buy goods, view their provenance, report items as stolen
-
----
 
 ## Smart Contracts
 
@@ -31,9 +27,6 @@
 - Facilitates ownership transfers via Provenance contract
 - Prevents resale of stolen items
 - Records and exposes sale history via `getSaleHistory()`
-
----
-
 ## Deployment & Testing Guide (Using Remix)
 
 1. Open [Remix IDE](https://remix.ethereum.org/)
@@ -50,16 +43,12 @@
    - Verify ownership change using `getOwner()` in `ProvenanceContract`
    - View transaction history using `getSaleHistory()`
 
----
-
 ## Trust and Transparency
 
 - Verified sellers only (via `EntityContract`)
 - Immutable ownership history
 - Public functions to view current owner and full sale logs
 - Stolen items cannot be resold
-
----
 
 ## Files in This Project
 
@@ -69,13 +58,9 @@ File Description
 `ProvenanceContract.sol` | Tracks component registration and good ownership
 `MarketplaceContract.sol` | Manages product listing, sales, and lifecycle
 
----
-
 ## Demo Video
 
-Link
-
----
+https://www.youtube.com/watch?v=n3_yoUKX9q8
 
 ## Authors
 

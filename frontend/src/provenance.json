@@ -3,6 +3,68 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "_entityContractAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "productId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "markedBy",
+				"type": "address"
+			}
+		],
+		"name": "ProductMarkedStolen",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "productId",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "unmarkedBy",
+				"type": "address"
+			}
+		],
+		"name": "ProductUnmarkedStolen",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "entityContract",
+		"outputs": [
+			{
+				"internalType": "contract IEntityContract",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "owner",
 				"type": "address"
 			}
@@ -172,6 +234,38 @@
 		"inputs": [
 			{
 				"internalType": "string",
+				"name": "productId",
+				"type": "string"
+			}
+		],
+		"name": "isProductStolen",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "productId",
+				"type": "string"
+			}
+		],
+		"name": "markAsStolen",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
 				"name": "componentId",
 				"type": "string"
 			},
@@ -223,6 +317,19 @@
 			}
 		],
 		"name": "registerProduct",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "productId",
+				"type": "string"
+			}
+		],
+		"name": "removeStolenMark",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

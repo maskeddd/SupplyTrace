@@ -4,7 +4,7 @@ import type { AbiItem } from "web3-utils";
 import provenanceABIJson from "../provenance.json";
 
 const provenanceABI = provenanceABIJson as AbiItem[];
-const CONTRACT_ADDRESS = "0x7A24f036A33de382c311c1448C73a8310371Cf6E";
+const CONTRACT_ADDRESS = "0x27902aD519EaB8Ba14f57A0577c91F1A96015DdE";
 
 const RegisterFinishedProduct = () => {
   const [account, setAccount] = useState("");

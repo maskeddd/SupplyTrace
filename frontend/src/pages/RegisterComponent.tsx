@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import provenanceABI from "../provenance.json";
-
-
+import entityABI from "../entity.json";
+import { useNavigate } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -10,13 +10,53 @@ declare global {
   }
 }
 
-const CONTRACT_ADDRESS = "0x7A24f036A33de382c311c1448C73a8310371Cf6E";
-
+const PROVENANCE_CONTRACT_ADDRESS = "0x27902aD519EaB8Ba14f57A0577c91F1A96015DdE";
+const ENTITY_CONTRACT_ADDRESS = "0x7680edBD58bC398fae8fd03B6fcab0DfF42d3D6F";
 
 const RegisterComponent: React.FC = () => {
   const [componentId, setComponentId] = useState("");
   const [location, setLocation] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkRegistration = async () => {
+      if (!window.ethereum) {
+        setMessage("Please install MetaMask.");
+        return;
+      }
+
+      const web3 = new Web3(window.ethereum);
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      const accounts = await web3.eth.getAccounts();
+      const account = accounts[0];
+
+      const entityContract = new web3.eth.Contract(
+        entityABI as any,
+        ENTITY_CONTRACT_ADDRESS
+      );
+
+      try {
+        const isRegistered = await entityContract.methods
+          .isEntityRegistered(account)
+          .call();
+
+        if (!isRegistered) {
+          alert("Access denied: You must be a registered entity.");
+          navigate("/");
+        } else {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error checking registration", error);
+        setMessage("Error verifying entity registration.");
+      }
+    };
+
+    checkRegistration();
+  }, [navigate]);
 
   const handleRegister = async () => {
     if (!window.ethereum) {
@@ -26,12 +66,11 @@ const RegisterComponent: React.FC = () => {
 
     try {
       const web3 = new Web3(window.ethereum);
-      await window.ethereum.request({ method: "eth_requestAccounts" });
       const accounts = await web3.eth.getAccounts();
 
       const contract = new web3.eth.Contract(
         provenanceABI as any,
-        CONTRACT_ADDRESS
+        PROVENANCE_CONTRACT_ADDRESS
       );
 
       await contract.methods
@@ -41,9 +80,13 @@ const RegisterComponent: React.FC = () => {
       setMessage("✅ Component registered successfully!");
     } catch (err: any) {
       console.error(err);
-      setMessage("❌ Error: " + (err?.message || "Something went wrong."));
+      setMessage(" Error: " + (err?.message || "Something went wrong."));
     }
   };
+
+  if (loading) {
+    return <p className="p-8 text-center">Checking access...</p>;
+  }
 
   return (
     <div className="p-8 max-w-xl mx-auto">

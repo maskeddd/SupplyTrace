@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Web3 from "web3";
 import provenanceABI from "../provenance.json";
 
-const CONTRACT_ADDRESS = "0x1B1D810a00742bd4C41df968B49541d86Afe2bFF";
+const CONTRACT_ADDRESS = "0x27902aD519EaB8Ba14f57A0577c91F1A96015DdE";
 
 const ViewOwnershipHistory = () => {
   const [productId, setProductId] = useState("");

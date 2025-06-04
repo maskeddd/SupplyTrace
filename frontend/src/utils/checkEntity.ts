@@ -1,0 +1,18 @@
+import Web3 from "web3";
+import type { AbiItem } from "web3-utils";
+import entityABIJson from "../entity.json";
+
+const ENTITY_CONTRACT_ADDRESS = "0x7680edBD58bC398fae8fd03B6fcab0DfF42d3D6F";
+const entityABI = entityABIJson as AbiItem[];
+
+export const checkIfEntityRegistered = async (account: string): Promise<boolean> => {
+  try {
+    const web3 = new Web3(window.ethereum);
+    const contract = new web3.eth.Contract(entityABI, ENTITY_CONTRACT_ADDRESS);
+    const isRegistered = await contract.methods.isEntityRegistered(account).call();
+    return isRegistered;
+  } catch (error) {
+    console.error("Error checking entity registration:", error);
+    return false;
+  }
+};
