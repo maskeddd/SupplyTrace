@@ -1,26 +1,40 @@
+// src/pages/ViewListings.tsx
+// View and buy active product listings from the MarketplaceContract
+// Combine data from both MarketplaceContract and ProvenanceContract to show full listing details
+
 import React, { useEffect, useState } from 'react';
 import Web3 from 'web3';
 import marketplaceABIJson from '../marketplace.json';
 import provenanceABIJson from '../provenance.json';
 
+// Contract addresses (replace if redeployed)
 const marketplaceAddress = '0xc7E0F0dD03567D8FEc420c8e4CdcD59750E56757';
 const provenanceAddress = '0x27902aD519EaB8Ba14f57A0577c91F1A96015DdE';
 
+// Listing structure to be displayed in the table
 type Listing = {
   productId: string;
   name: string;
   seller: string;
-  price: string;
-  ethPrice: string;
+  price: string;     // in wei
+  ethPrice: string;  // in ETH
 };
 
 const ViewListings: React.FC = () => {
+  // Web3 & smart contract instances
   const [web3, setWeb3] = useState<Web3 | null>(null);
   const [marketplace, setMarketplace] = useState<any>(null);
   const [provenance, setProvenance] = useState<any>(null);
-  const [listings, setListings] = useState<Listing[]>([]);
+
+  // User accounts from MetaMask
   const [accounts, setAccounts] = useState<string[]>([]);
 
+  // Listings retrieved from Marketplace + Provenance
+  const [listings, setListings] = useState<Listing[]>([]);
+
+  /**
+   * 🔌 Initialize web3, contracts, and user accounts
+   */
   useEffect(() => {
     const init = async () => {
       if (window.ethereum) {
@@ -28,9 +42,11 @@ const ViewListings: React.FC = () => {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         const _accounts = await _web3.eth.getAccounts();
 
+        // Instantiate smart contracts
         const _marketplace = new _web3.eth.Contract(marketplaceABIJson as any, marketplaceAddress);
         const _provenance = new _web3.eth.Contract(provenanceABIJson as any, provenanceAddress);
 
+        // Save to state
         setWeb3(_web3);
         setAccounts(_accounts);
         setMarketplace(_marketplace);
@@ -40,6 +56,9 @@ const ViewListings: React.FC = () => {
     init();
   }, []);
 
+  /**
+   * Fetch all active listings and supplement them with product names from ProvenanceContract
+   */
   useEffect(() => {
     const fetchListings = async () => {
       if (!marketplace || !provenance || !web3) return;
@@ -50,12 +69,13 @@ const ViewListings: React.FC = () => {
 
         for (const id of productIds) {
           const listing = await marketplace.methods.getListing(id).call();
-          if (listing[2]) {
-            // Get the product name by checking Provenance ownership
-            let name = 'Unknown';
-            const seller = listing[0];
-            const products = await provenance.methods.getProductsByOwner(seller).call();
 
+          if (listing[2]) {
+            const seller = listing[0];
+            let name = 'Unknown';
+
+            // Attempt to match productId with registered product name
+            const products = await provenance.methods.getProductsByOwner(seller).call();
             for (const product of products) {
               if (product.productId === id) {
                 name = product.name;
@@ -66,7 +86,7 @@ const ViewListings: React.FC = () => {
             result.push({
               productId: id,
               name,
-              seller: listing[0],
+              seller,
               price: listing[1],
               ethPrice: web3.utils.fromWei(listing[1], 'ether'),
             });
@@ -82,6 +102,9 @@ const ViewListings: React.FC = () => {
     fetchListings();
   }, [marketplace, provenance, web3]);
 
+  /**
+   * Executes purchase transaction for a listed product
+   */
   const handleBuy = async (productId: string, price: string) => {
     if (!marketplace || !web3 || accounts.length === 0) return;
 

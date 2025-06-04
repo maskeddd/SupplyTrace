@@ -1,14 +1,23 @@
+// src/pages/ViewComponents.tsx
+// Display all components registered by the current MetaMask account
+
 import React, { useEffect, useState } from "react";
 import Web3 from "web3";
 import provenanceABI from "../provenance.json";
 
+// Deployed contract address (replace if redeployed)
 const CONTRACT_ADDRESS = "0x27902aD519EaB8Ba14f57A0577c91F1A96015DdE";
 
-
 const ViewComponents = () => {
+  // List of components fetched from the smart contract
   const [components, setComponents] = useState<any[]>([]);
+  // Current Ethereum address from MetaMask
   const [account, setAccount] = useState<string>("");
 
+  /**
+   * Fetches the components owned by the connected MetaMask account
+   * Uses the getComponentsByOwner method from the ProvenanceContract
+   */
   useEffect(() => {
     const fetchComponents = async () => {
       if ((window as any).ethereum) {
@@ -35,6 +44,8 @@ const ViewComponents = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Your Registered Components</h1>
+
+      {/* Display a message if no components are found */}
       {components.length === 0 ? (
         <p>No components found for your address.</p>
       ) : (
@@ -51,7 +62,9 @@ const ViewComponents = () => {
               <tr key={idx}>
                 <td className="border p-2">{component.componentId}</td>
                 <td className="border p-2">{component.location}</td>
-                <td className="border p-2">{new Date(Number(component.timestamp) * 1000).toLocaleString()}</td>
+                <td className="border p-2">
+                  {new Date(Number(component.timestamp) * 1000).toLocaleString()}
+                </td>
               </tr>
             ))}
           </tbody>

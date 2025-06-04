@@ -8,8 +8,6 @@ import RegisterComponent from "./pages/RegisterComponent";
 import AddComponentAddress from "./pages/AddComponentAddress";
 import RegisterProduct from "./pages/RegisterProduct";
 import ViewProducts from "./pages/ViewProducts";
-import RegisterFinishedProduct from "./pages/RegisterFinishedProduct";
-import ViewFinishedProducts from "./pages/ViewFinishedProducts";
 import TransferOwnership from "./pages/TransferOwnership";
 import MarkStolenProduct from "./pages/MarkStolenProduct";
 import CheckStolenStatus from "./pages/CheckStolenStatus";
@@ -50,8 +48,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/check-stolen-status" element={<CheckStolenStatus />} />
         <Route path="/view-listings" element={<ViewListings />} />
         <Route path="/view-products" element={<ViewProducts />} />
-        <Route path="/register-finished-product" element={<RegisterFinishedProduct />} />
-        <Route path="/view-finished-products" element={<ViewFinishedProducts />} />
         <Route path="/transfer-ownership" element={<TransferOwnership />} />
         <Route path="/view-ownership-history" element={<ViewOwnershipHistory />} />
         <Route path="/view-components" element={<ViewComponents />} /> {/* new route */}
